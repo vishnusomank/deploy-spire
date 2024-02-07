@@ -1,0 +1,47 @@
+apiVersion: v1
+data:
+  entry.sh: |-
+    #!/bin/sh
+
+    SOCKET_FILE="/tmp/spire-server/private/api.sock"
+
+    if [[ -S "$SOCKET_FILE" ]]; then      
+      
+      ENTRY_CHECK=$(/bin/spire-server entry show -spiffeID spiffe://accuknox.com/saas/cluster-management -socketPath $SOCKET_FILE)
+
+      if echo "$ENTRY_CHECK" | grep -q "Entry ID"; then
+          echo "Entry ID for saas/cluster-management already exists"
+      else 
+          /bin/spire-server entry create -parentID spiffe://accuknox.com/saas/agent -spiffeID spiffe://accuknox.com/saas/cluster-management -selector k8s_sat:sa:cluster-mgmt  -selector k8s_sat:pod-label:app:cluster-management-service -socketPath $SOCKET_FILE -x509SVIDTTL  -jwtSVIDTTL 
+      fi      
+      
+      ENTRY_CHECK=$(/bin/spire-server entry show -spiffeID spiffe://accuknox.com/saas/cluster-onboarding -socketPath $SOCKET_FILE)
+
+      if echo "$ENTRY_CHECK" | grep -q "Entry ID"; then
+          echo "Entry ID for saas/cluster-onboarding already exists"
+      else 
+          /bin/spire-server entry create -parentID spiffe://accuknox.com/saas/agent -spiffeID spiffe://accuknox.com/saas/cluster-onboarding -selector k8s_sat:sa:cluster-onboard  -selector k8s_sat:pod-label:app:cluster-onboarding-service -socketPath $SOCKET_FILE -x509SVIDTTL 86400 -jwtSVIDTTL 86400
+      fi      
+      
+      ENTRY_CHECK=$(/bin/spire-server entry show -spiffeID spiffe://accuknox.com/saas/knox-gateway -socketPath $SOCKET_FILE)
+
+      if echo "$ENTRY_CHECK" | grep -q "Entry ID"; then
+          echo "Entry ID for saas/knox-gateway already exists"
+      else 
+          /bin/spire-server entry create -parentID spiffe://accuknox.com/saas/agent -spiffeID spiffe://accuknox.com/saas/knox-gateway -selector k8s_sat:sa:knox-gateway  -selector k8s_sat:pod-label:app:knox-gateway -selector k8s_sat:pod-label:environment:dev -socketPath $SOCKET_FILE -x509SVIDTTL 86400 -jwtSVIDTTL 86400
+      fi      
+      
+      ENTRY_CHECK=$(/bin/spire-server entry show -spiffeID spiffe://accuknox.com/saas/policyprovider-service -socketPath $SOCKET_FILE)
+
+      if echo "$ENTRY_CHECK" | grep -q "Entry ID"; then
+          echo "Entry ID for saas/policyprovider-service already exists"
+      else 
+          /bin/spire-server entry create -parentID spiffe://accuknox.com/saas/agent -spiffeID spiffe://accuknox.com/saas/policyprovider-service -selector k8s_sat:sa:policyprovider-service  -selector k8s_sat:pod-label:app:policy-provider-service -selector k8s_sat:pod-label:environment:dev -socketPath $SOCKET_FILE -x509SVIDTTL 86400 -jwtSVIDTTL 86400
+      fi
+
+    fi
+kind: ConfigMap
+metadata:
+  labels:
+    app: spire-server
+  name: spire-server-default-entry

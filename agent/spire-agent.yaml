@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: spire-agent
+  name: spire-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spire-agent
+  template:
+    metadata:
+      labels:
+        app: spire-agent
+    spec:
+      containers:
+        - args:
+            - '-config'
+            - /run/spire/config/agent.conf
+          image: knoxuser/spire:agent
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /live
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: spire-agent
+          readinessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /ready
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          volumeMounts:
+            - mountPath: /run/spire/config
+              name: spire-agent-config
+              readOnly: true
+            - mountPath: /run/spire/sockets
+              name: spire-agent
+      dnsPolicy: ClusterFirst
+      initContainers:
+        - args:
+            - '-t'
+            - '30'
+            - spire-server:8081
+          image: knoxuser/spire:wait-for-it
+          imagePullPolicy: Always
+          name: init
+      restartPolicy: Always
+      serviceAccount: spire-agent
+      serviceAccountName: spire-agent
+      volumes:
+        - emptyDir: {}
+          name: token-dir
+        - configMap:
+            defaultMode: 420
+            name: token
+          name: token
+        - configMap:
+            defaultMode: 420
+            name: spire-agent
+          name: spire-agent-config
+        - hostPath:
+            path: /run/spire
+            type: DirectoryOrCreate
+          name: spire-agent

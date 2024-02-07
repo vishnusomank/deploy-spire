@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app: spire-server
+  name: spire-server-config
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - configmaps
+    verbs:
+      - patch
+      - get
+      - list
+      - update
+      - delete
