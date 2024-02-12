@@ -17,7 +17,7 @@ data:
       DataStore "sql" {
         plugin_data {
           database_type = "mysql"
-          connection_string = "spire:test@tcp(spire-mysql-svc:3306)/spire?parseTime=true"
+          connection_string = "root:temppassword@tcp(spire-mysql-svc:3306)/spire?parseTime=true"
         }
       }
 

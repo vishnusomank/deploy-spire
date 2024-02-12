@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: spire-mysql-initdb-config
   labels:
-    app: spire-server
+    app: spire-mysql
     type: init-script
 data:
   init.sql: |

@@ -5,14 +5,14 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: spire-server
+      app: spire-mysql
       type: database
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: spire-server
+        app: spire-mysql
         type: database
     spec:
       containers:
@@ -28,7 +28,7 @@ spec:
             - containerPort: 3306
               name: mysql
           volumeMounts:
-            - name: mysql-persistent-storage
+            - name: spire-mysql-persistent-storage
               mountPath: /var/lib/mysql
             - name: mysql-initdb
               mountPath: /docker-entrypoint-initdb.d
