@@ -16,8 +16,8 @@ data:
     plugins {
       DataStore "sql" {
         plugin_data {
-          database_type = "sqlite3"
-          connection_string = "/run/spire-server/spire.sqlite3"
+          database_type = "mysql"
+          connection_string = "spire:test@tcp(spire-mysql-svc:3306)/spire?parseTime=true"
         }
       }
 

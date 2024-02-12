@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spire-mysql-initdb-config
+  labels:
+    app: spire-server
+    type: init-script
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS spire;
